@@ -46,7 +46,7 @@ function gc_content(seq)
     count = 0
 
     for base in seq
-        if base == DNA_G || base == DNA_C
+        if base == "G" || base == "C"
             count = count + 1
         end
     end
