@@ -2,7 +2,7 @@ using Assignment07
 using Test
 
 @testset "Assignment07" begin
-@testset "Using Strings" begin
+@testset "Using String" begin
     
     @testset "normalizeDNA" begin
         @test normalizeDNA("aatgn") == "AATGN"
