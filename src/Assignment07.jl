@@ -42,15 +42,19 @@ function composition(seq)
 end
 
 function gc_content(seq)
-    seq = normalizeDNA(seq)
-    count = 0
+    bases = composition(seq)
 
-    for base in seq
-        if base == "G" || base == "C"
-            count = count + 1
-        end
-    end
-    return count / length(seq)
+    return (get(bases,'G', 0) + get(bases, 'C', 0)) / length(seq)
+end
+
+function complementbase(base)
+    base = uppercase(string(base))
+    comp = Dict("A"=>'T',
+                "T"=>'A',
+                "G"=>'C',
+                "C"=>'G',
+                "N"=>'N')
+    return comp[uppercase(base)]
 end
 
 function complement(seq)
@@ -58,19 +62,11 @@ function complement(seq)
     result = ""
 
     for base in seq
-        if base == "A"
-            result = result * "T"
-        elseif base == "T"
-            result = result * "A"
-        elseif base == "G"
-            result = result * "C"
-        elseif base == "C"
-            result = result * "G"
-        else result = result * "N"
-        end 
+        result = result * complementbase(base)
     end
     return result
 end
+
 
 function reverse_complement(seq)
     seq = normalizeDNA(seq)
@@ -78,41 +74,34 @@ function reverse_complement(seq)
     index = length(seq)
 
     while( index > 0)
-        if seq[index] == "A"
-            result = result * "T"
-        elseif seq[index] == "T"
-            result = result * "A"
-        elseif seq[index] == "G"
-            result = result * "C"
-        elseif seq[index] == "C"
-            result = result * "G"
-        else result = result * "N"
-        end 
+        result = result * complementbase(seq[index])
         index = index - 1
     end
     return result
 end
 
 function parse_fasta(path)
-    vector1 = Vector()
-    vector2 = Vector()
+    heading = Vector()
+    seqs = Vector()
     sequence = ""
 
     for line in eachline(path)
         if startswith(line, '>') 
             if length(sequence) != 0
-                push!(vector2, sequence)
+                push!(seqs, sequence)
             end
             sequence = "" 
-            push!(vector1, line[2:end])
-        else sequence = sequence * line
+            push!(heading, line[2:end])
+        else 
+            line = normalizeDNA(line)
+            sequence = sequence * line
         end
     end
     if length(sequence) != 0
-        push!(vector2, sequence)
+        push!(seqs, sequence)
     end
 
-    return vector1, vector2
+    return heading, seqs
 end
 
 end # module Assignment07
